@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:bytepusher_emulator/memory.dart';
 import 'package:flutter/widgets.dart';
 
 class BytePusherPainterNotifier extends ChangeNotifier {
@@ -22,7 +21,10 @@ class BytePusherPainterNotifier extends ChangeNotifier {
 }
 
 class BytePusherPainter extends CustomPainter {
-  BytePusherPainter() : super(repaint: BytePusherPainterNotifier());
+  final List<List<(int, int, int)>> videoBuffer;
+
+  BytePusherPainter({required this.videoBuffer})
+      : super(repaint: BytePusherPainterNotifier());
 
   // "pixel" dimensions
   static const width = 256;
@@ -30,33 +32,11 @@ class BytePusherPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (Memory.isLoaded()) {
-      // handle keys
-      Memory.mergeKeyOpsIntoMemory();
-
-      var pc = Memory.fetchThreeByteProgramCounter();
-
-      for (var i = 0; i < 65536; i++) {
-        Memory.copyOneByteFromAtoB(pc);
-        pc = Memory.jumpPointerToC(pc);
-      }
-
-      for (var x = 0; x < 256; x++) {
-        for (var y = 0; y < 256; y++) {
-          final pixelColorAddress = Memory.getPixelColorAddress(x, y);
-          var color = (0, 0, 0);
-
-          if (Memory.get(pixelColorAddress) < 216) {
-            final blue = (Memory.get(pixelColorAddress) % 6) * 51;
-            final green = ((Memory.get(pixelColorAddress) ~/ 6) % 6) * 51;
-            final red = ((Memory.get(pixelColorAddress) ~/ 36) % 6) * 51;
-
-            color = (red, green, blue);
-          }
-
-          _drawPixel(canvas, size, x.toDouble(), y.toDouble(),
-              Color.fromARGB(255, color.$1, color.$2, color.$3));
-        }
+    for (var x = 0; x < 256; x++) {
+      for (var y = 0; y < 256; y++) {
+        final (r, g, b) = videoBuffer[x][y];
+        _drawPixel(canvas, size, x.toDouble(), y.toDouble(),
+            Color.fromARGB(255, r, g, b));
       }
     }
   }

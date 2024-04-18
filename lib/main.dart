@@ -1,5 +1,5 @@
-import 'package:bytepusher_emulator/bytepusher_painter.dart';
 import 'package:bytepusher_emulator/frame.dart';
+import 'package:bytepusher_emulator/virtual_machine.dart';
 import 'package:flutter/material.dart';
 
 void main() {
@@ -20,19 +20,8 @@ class MyApp extends StatelessWidget {
       ),
       home: Container(
         decoration: const BoxDecoration(color: Colors.blue),
-        child: Frame(
-          child: LayoutBuilder(
-            // Inner yellow container
-            builder: (_, constraints) => Container(
-              width: double.infinity,
-              height: double.infinity,
-              color: Colors.yellow,
-              child: CustomPaint(
-                painter: BytePusherPainter(),
-                willChange: true,
-              ),
-            ),
-          ),
+        child: const Frame(
+          child: VirtualMachine(),
         ),
       ),
     );

@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bytepusher_emulator/keyboard_button.dart';
 import 'package:bytepusher_emulator/memory.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 class Frame extends StatelessWidget {
@@ -22,10 +23,16 @@ class Frame extends StatelessWidget {
                 FilePickerResult? result =
                     await FilePicker.platform.pickFiles();
                 if (result != null) {
-                  final file = File(result.files.first.path!);
-                  final bytes = await file.readAsBytes();
-                  Memory.clear();
-                  Memory.load(bytes);
+                  if (kIsWeb) {
+                    final bytes = result.files.first.bytes;
+                    Memory.clear();
+                    Memory.load(bytes!);
+                  } else {
+                    final file = File(result.files.first.path!);
+                    final bytes = await file.readAsBytes();
+                    Memory.clear();
+                    Memory.load(bytes);
+                  }
                 }
               },
               child: const Text("Insert ROM"),

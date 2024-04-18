@@ -62,4 +62,9 @@ class Memory {
         keyMem[1] << 1 |
         keyMem[0];
   }
+
+  static List<int> getAudioBytes() {
+    final offset = memory[6] * 256 + memory[7] * 0x100;
+    return memory.sublist(offset, offset + 0x100);
+  }
 }
